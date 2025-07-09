@@ -1,0 +1,14 @@
+{
+    "manifest_version": 3,
+    "name": "LinkedIn Post Extractor",
+    "description": "Scrolls through your LinkedIn activity feed and downloads all your posts as JSON and CSV.",
+    "version": "1.0",
+    "permissions": ["scripting", "activeTab", "tabs"],
+    "background": {
+      "service_worker": "background.js"
+    },
+    "action": {
+      "default_popup": "popup.html"
+    }
+  }
+  

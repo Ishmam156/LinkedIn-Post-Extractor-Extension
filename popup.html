@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>LinkedIn Post Extractor</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Roboto, sans-serif;
+      background-color: #f9f9f9;
+      padding: 16px;
+      width: 300px;
+      box-sizing: border-box;
+    }
+
+    h3 {
+      margin: 0 0 12px 0;
+      font-size: 18px;
+      color: #202124;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      font-size: 15px;
+      font-weight: 600;
+      background-color: #0073b1;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    button:hover {
+      background-color: #005f91;
+    }
+
+    /* Spinner Style */
+    .spinner {
+      width: 18px;
+      height: 18px;
+      border: 3px solid #ffffff;
+      border-top: 3px solid #0073b1;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: inline-block;
+      vertical-align: middle;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+
+    #status {
+      margin-top: 16px;
+      padding: 12px;
+      border-left: 4px solid;
+      font-size: 14px;
+      border-radius: 4px;
+      min-height: 44px;
+      line-height: 1.4;
+      transition: all 0.2s ease;
+    }
+
+    /* Status Types */
+    .status-info {
+      color: #2b6cb0;
+      background-color: #eef3f8;
+      border-left-color: #0073b1;
+    }
+
+    .status-success {
+      color: #2f855a;
+      background-color: #e6fffa;
+      border-left-color: #2f855a;
+    }
+
+    .status-error {
+      color: #e53e3e;
+      background-color: #ffe6e6;
+      border-left-color: #e53e3e;
+    }
+
+    .status-scrolling {
+      color: #8a6d3b;
+      background-color: #fff8dc;
+      border-left-color: #c9a700;
+    }
+
+
+
+  </style>
+</head>
+<body>
+  <h3>Extract LinkedIn Posts</h3>
+  <button id="extractBtn">Start Extraction</button>
+  <div id="status" class="status-info">Ready to start.</div>
+  <script src="popup.js"></script>
+</body>
+</html>
