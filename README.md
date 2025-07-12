@@ -4,7 +4,7 @@ Extract all your LinkedIn posts and help AI (like ChatGPT) learn your unique wri
 
 ## Overview
 
-**LinkedIn Post Extractor** is a free, open-source Chrome extension that allows you to download all posts from any LinkedIn profile (including your own) as JSON and CSV files. This data can then be used to analyze your writing style, generate new post ideas, or assist AI tools in writing posts that sound just like you.
+**LinkedIn Post Extractor** is a free, open-source Chrome extension that allows you to download all posts from your LinkedIn profile as JSON and CSV files. This data can then be used to analyze your writing style, generate new post ideas, or assist AI tools in writing posts that sound just like you.
 
 - **No data leaves your computer**: All extraction happens locally. No posts are sent to any server.
 - **Easy to use**: Simple step-by-step instructions for non-technical users.
@@ -12,7 +12,7 @@ Extract all your LinkedIn posts and help AI (like ChatGPT) learn your unique wri
 
 ## Features
 
-- Download all posts from any LinkedIn profile (when viewing their "All Activity" page)
+- Download all posts from your LinkedIn profile (when viewing their "All Activity" page)
 - Exports data as both JSON and CSV
 - No installation required—just load the unpacked extension in Chrome
 - 100% local, privacy-first
@@ -42,8 +42,6 @@ Extract all your LinkedIn posts and help AI (like ChatGPT) learn your unique wri
 
 ## FAQ
 
-- **Does it work for any profile?**
-  - Yes, as long as you are on the "All Activity" page of the profile.
 - **Is my data shared?**
   - No, all data stays on your computer. Nothing is sent to any server.
 - **Can I edit the exported files?**
