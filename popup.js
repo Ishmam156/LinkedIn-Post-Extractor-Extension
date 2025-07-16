@@ -56,27 +56,8 @@ function extractLinkedInPostsWithFeedback() {
     chrome.runtime.sendMessage({ type: "statusUpdate", payload: text, level });
   };
 
-  (async () => {
-    sendStatus("Scrolling through the page...", "scrolling");
-
-    let lastScrollHeight = 0;
-    let attempts = 0;
-
-    while (attempts < 10) {
-      window.scrollTo(0, document.body.scrollHeight);
-      await delay(800);
-      const currentScrollHeight = document.body.scrollHeight;
-      if (currentScrollHeight === lastScrollHeight) {
-        attempts++;
-      } else {
-        attempts = 0;
-        lastScrollHeight = currentScrollHeight;
-      }
-    }
-
-    sendStatus("Finished scrolling. Extracting posts...", "info");
-
-    const allPosts = [];
+  const extractPosts = () => {
+    const posts = [];
 
     document.querySelectorAll(
       '.feed-shared-update-v2__control-menu-container.display-flex.flex-column.flex-grow-1'
@@ -104,16 +85,56 @@ function extractLinkedInPostsWithFeedback() {
 
       const cleaned = `${mainLines.join('\n\n')}${hashtags.length ? `\n\n${hashtags.join(' ')}` : ''}`;
 
-      allPosts.push({
+      posts.push({
         index: index + 1,
         content: cleaned
       });
     });
 
-    sendStatus(`Extracted ${allPosts.length} posts. Preparing downloads...`, "info");
+    return posts;
+  };
+
+  (async () => {
+    sendStatus("Slow scrolling started...", "scrolling");
+
+    let allExtractedPosts = [];
+    let postContentSet = new Set();
+
+    let totalScrolls = 0;
+    let stableTries = 0;
+    let maxScrollTries = 300; // prevent infinite loops
+    let scrollIncrement = 500;
+
+    while (stableTries < 10 && totalScrolls < maxScrollTries) {
+      window.scrollBy(0, scrollIncrement);
+      await delay(1200);
+
+      const newlyExtracted = extractPosts();
+      let newAdditions = 0;
+
+      newlyExtracted.forEach(post => {
+        if (!postContentSet.has(post.content)) {
+          postContentSet.add(post.content);
+          allExtractedPosts.push(post);
+          newAdditions++;
+        }
+      });
+
+      sendStatus(`Scrolled ${totalScrolls + 1} steps. Total unique posts: ${allExtractedPosts.length}`, "info");
+
+      if (newAdditions === 0) {
+        stableTries++;
+      } else {
+        stableTries = 0;
+      }
+
+      totalScrolls++;
+    }
+
+    sendStatus(`Scroll complete. ${allExtractedPosts.length} posts extracted. Preparing files...`, "info");
 
     // JSON
-    const jsonBlob = new Blob([JSON.stringify(allPosts, null, 2)], { type: 'application/json' });
+    const jsonBlob = new Blob([JSON.stringify(allExtractedPosts, null, 2)], { type: 'application/json' });
     const jsonUrl = URL.createObjectURL(jsonBlob);
     const jsonLink = document.createElement('a');
     jsonLink.href = jsonUrl;
@@ -126,7 +147,7 @@ function extractLinkedInPostsWithFeedback() {
     // CSV
     const escapeCSV = (text) => `"${text.replace(/"/g, '""')}"`;
     const csvHeader = "Index,Content\n";
-    const csvRows = allPosts.map(post => `${post.index},${escapeCSV(post.content)}`);
+    const csvRows = allExtractedPosts.map((post, i) => `${i + 1},${escapeCSV(post.content)}`);
     const csvBlob = new Blob([csvHeader + csvRows.join("\n")], { type: 'text/csv' });
     const csvUrl = URL.createObjectURL(csvBlob);
     const csvLink = document.createElement('a');
@@ -137,7 +158,6 @@ function extractLinkedInPostsWithFeedback() {
     document.body.removeChild(csvLink);
     URL.revokeObjectURL(csvUrl);
 
-    sendStatus(`<strong>${allPosts.length} posts extracted.</strong> Files downloaded successfully.`, "success");
-
+    sendStatus(`<strong>${allExtractedPosts.length} posts extracted.</strong> Files downloaded successfully.`, "success");
   })();
 }
