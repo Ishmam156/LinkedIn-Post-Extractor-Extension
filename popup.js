@@ -85,9 +85,77 @@ function extractLinkedInPostsWithFeedback() {
 
       const cleaned = `${mainLines.join('\n\n')}${hashtags.length ? `\n\n${hashtags.join(' ')}` : ''}`;
 
+      // Extract reactions count
+      let reactionsCount = 0;
+      const reactionsElement = parentEl.querySelector('.social-details-social-counts__reactions-count');
+      if (reactionsElement) {
+        const reactionsText = reactionsElement.innerText.trim();
+        if (reactionsText) {
+          // Handle "XYZ and 40 others" format
+          if (reactionsText.includes(' and ') && reactionsText.includes(' others')) {
+            const match = reactionsText.match(/(\d+)\s+others/);
+            if (match) {
+              reactionsCount = parseInt(match[1]);
+            }
+          } else {
+            // Handle direct number format
+            const numberMatch = reactionsText.match(/(\d+)/);
+            if (numberMatch) {
+              reactionsCount = parseInt(numberMatch[1]);
+            }
+          }
+        }
+      }
+
+      // Extract comments count
+      let commentsCount = 0;
+      const commentsElement = parentEl.querySelector('.social-details-social-counts__comments');
+      if (commentsElement) {
+        const commentsText = commentsElement.innerText.trim();
+        if (commentsText) {
+          const match = commentsText.match(/(\d+)\s+comments?/);
+          if (match) {
+            commentsCount = parseInt(match[1]);
+          }
+        }
+      }
+
+      // Extract reposts count
+      let repostsCount = 0;
+      const repostsElement = parentEl.querySelector('.social-details-social-counts__item.social-details-social-counts__item--height-two-x.flex-shrink-1.overflow-hidden');
+      if (repostsElement) {
+        const repostsText = repostsElement.innerText.trim();
+        if (repostsText) {
+          const match = repostsText.match(/(\d+)\s+reposts?/);
+          if (match) {
+            repostsCount = parseInt(match[1]);
+          }
+        }
+      }
+
+      // Extract impressions count
+      let impressionsCount = 0;
+      const impressionsElements = parentEl.querySelectorAll('.ca-entry-point__num-views.t-14');
+      if (impressionsElements.length > 0) {
+        // Get the first element (impressions)
+        const impressionsElement = impressionsElements[0];
+        const impressionsText = impressionsElement.innerText.trim();
+        if (impressionsText) {
+          const match = impressionsText.match(/([\d,]+)\s+impressions?/);
+          if (match) {
+            // Remove commas and convert to number
+            impressionsCount = parseInt(match[1].replace(/,/g, ''));
+          }
+        }
+      }
+
       posts.push({
         index: index + 1,
-        content: cleaned
+        content: cleaned,
+        reactions: reactionsCount,
+        comments: commentsCount,
+        reposts: repostsCount,
+        impressions: impressionsCount
       });
     });
 
@@ -146,8 +214,10 @@ function extractLinkedInPostsWithFeedback() {
 
     // CSV
     const escapeCSV = (text) => `"${text.replace(/"/g, '""')}"`;
-    const csvHeader = "Index,Content\n";
-    const csvRows = allExtractedPosts.map((post, i) => `${i + 1},${escapeCSV(post.content)}`);
+    const csvHeader = "Index,Content,Reactions,Comments,Reposts,Impressions\n";
+    const csvRows = allExtractedPosts.map((post, i) => 
+      `${i + 1},${escapeCSV(post.content)},${post.reactions},${post.comments},${post.reposts},${post.impressions}`
+    );
     const csvBlob = new Blob([csvHeader + csvRows.join("\n")], { type: 'text/csv' });
     const csvUrl = URL.createObjectURL(csvBlob);
     const csvLink = document.createElement('a');
