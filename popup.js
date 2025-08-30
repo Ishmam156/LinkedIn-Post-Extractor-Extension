@@ -228,6 +228,6 @@ function extractLinkedInPostsWithFeedback() {
     document.body.removeChild(csvLink);
     URL.revokeObjectURL(csvUrl);
 
-    sendStatus(`<strong>${allExtractedPosts.length} posts extracted.</strong> Files downloaded successfully.`, "success");
+    sendStatus(`Done. ${allExtractedPosts.length} posts extracted. Files downloaded successfully.`, "success");
   })();
 }
