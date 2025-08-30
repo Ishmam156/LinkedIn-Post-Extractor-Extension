@@ -85,23 +85,21 @@ function extractLinkedInPostsWithFeedback() {
 
       const cleaned = `${mainLines.join('\n\n')}${hashtags.length ? `\n\n${hashtags.join(' ')}` : ''}`;
 
-      // Extract reactions count
+      // Extract reactions count using aria-label (more reliable)
       let reactionsCount = 0;
-      const reactionsElement = parentEl.querySelector('.social-details-social-counts__reactions-count');
-      if (reactionsElement) {
-        const reactionsText = reactionsElement.innerText.trim();
-        if (reactionsText) {
-          // Handle "XYZ and 40 others" format
-          if (reactionsText.includes(' and ') && reactionsText.includes(' others')) {
-            const match = reactionsText.match(/(\d+)\s+others/);
-            if (match) {
-              reactionsCount = parseInt(match[1]);
-            }
+      const reactionsButton = parentEl.querySelector('.social-details-social-counts__reactions button');
+      if (reactionsButton) {
+        const ariaLabel = reactionsButton.getAttribute('aria-label');
+        if (ariaLabel) {
+          // Format 1: "131 reactions"
+          const simpleMatch = ariaLabel.match(/(\d+)\s+reactions/);
+          if (simpleMatch) {
+            reactionsCount = parseInt(simpleMatch[1]);
           } else {
-            // Handle direct number format
-            const numberMatch = reactionsText.match(/(\d+)/);
-            if (numberMatch) {
-              reactionsCount = parseInt(numberMatch[1]);
+            // Format 2: "Person Name and X others"
+            const complexMatch = ariaLabel.match(/and\s+(\d+)\s+others/);
+            if (complexMatch) {
+              reactionsCount = parseInt(complexMatch[1]);
             }
           }
         }
@@ -173,7 +171,7 @@ function extractLinkedInPostsWithFeedback() {
     let maxScrollTries = 300; // prevent infinite loops
     let scrollIncrement = 500;
 
-    while (stableTries < 10 && totalScrolls < maxScrollTries) {
+    while (stableTries < 30 && totalScrolls < maxScrollTries) {
       window.scrollBy(0, scrollIncrement);
       await delay(1200);
 
